@@ -158,15 +158,13 @@ Follow the same pattern as mission-control:
 
 ---
 
-## Notes / Decisions Pending
+## Decisions Made
 
-- Does Darrell want baseline auto-updated after each report, or manual control?
-- Report threshold: report every new tag, or batch weekly?
-- Tag consolidation: read-only suggestions, or actually rename via API?
-- Auth for MCP endpoint: **Tailscale ACLs** (decided 2026-03-14) — no shared secret needed for now. Review if/when access needs finer control.
-- Does Darrell want baseline auto-updated after each report, or manual control?
-- Report threshold: report every new tag, or batch weekly?
-- Tag consolidation: read-only suggestions, or actually rename via API?
+- **Auth (MCP endpoint):** Tailscale ACLs only. No shared secret for now. Review if scope expands.
+- **Baseline updates:** Auto-update after every report. No manual control needed.
+- **Cron schedule:** Daily at 8 AM Vancouver time (`0 8 * * *`). Slack DM to Darrell if new tags found, silent if not. Cron ID: `817b8ad2-eb3a-49ba-b7b7-9a0af1ca8be1`
+- **MC module scope:** New tags display only (count + list). No recent bookmarks needed.
+- **Tag consolidation:** Deferred — read-only suggestions first, API rename later.
 
 ---
 
