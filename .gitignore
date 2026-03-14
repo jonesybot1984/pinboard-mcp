@@ -1,0 +1,6 @@
+.env
+tags_baseline.json
+__pycache__/
+*.pyc
+.venv/
+venv/
