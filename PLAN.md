@@ -161,8 +161,9 @@ Follow the same pattern as mission-control:
 ## Decisions Made
 
 - **Auth (MCP endpoint):** Tailscale ACLs only. No shared secret for now. Review if scope expands.
-- **Baseline updates:** Auto-update after every report. No manual control needed.
-- **Cron schedule:** Daily at 8 AM Vancouver time (`0 8 * * *`). Slack DM to Darrell if new tags found, silent if not. Cron ID: `817b8ad2-eb3a-49ba-b7b7-9a0af1ca8be1`
+- **Baseline updates:** Resets on the 1st of each month. Daily check reports against the current baseline without updating it.
+- **Daily cron:** `0 8 * * *` Vancouver — report new tags since baseline, Slack DM if found, silent if not. ID: `817b8ad2-eb3a-49ba-b7b7-9a0af1ca8be1`
+- **Monthly cron:** `0 8 1 * *` Vancouver — reset baseline to current tag state, confirm via Slack DM. ID: `8ed55199-e7b6-485e-8169-ea9aa1d1c410`
 - **MC module scope:** New tags display only (count + list). No recent bookmarks needed.
 - **Tag consolidation:** Deferred — read-only suggestions first, API rename later.
 
