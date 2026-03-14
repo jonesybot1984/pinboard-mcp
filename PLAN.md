@@ -163,8 +163,27 @@ Follow the same pattern as mission-control:
 - Does Darrell want baseline auto-updated after each report, or manual control?
 - Report threshold: report every new tag, or batch weekly?
 - Tag consolidation: read-only suggestions, or actually rename via API?
-- Auth for MCP endpoint: shared secret header, or lean on Tailscale ACLs as the security layer?
+- Auth for MCP endpoint: **Tailscale ACLs** (decided 2026-03-14) — no shared secret needed for now. Review if/when access needs finer control.
+- Does Darrell want baseline auto-updated after each report, or manual control?
+- Report threshold: report every new tag, or batch weekly?
+- Tag consolidation: read-only suggestions, or actually rename via API?
 
 ---
 
-*Written: 2026-03-14. Updated: 2026-03-14 (tailnet deployment requirement added).*
+## Mission Control Module (Planned)
+
+A widget/page in MC (`/tools/pinboard` or similar) showing basic Pinboard status:
+
+- Total bookmark count
+- Total tag count
+- New tags since last baseline (with counts)
+- Last checked timestamp
+- Link to full tag list
+
+**Data source:** MC calls the tag_watcher logic (or reads `tags_baseline.json` + calls the API directly). Could be a simple read-only panel to start, with more interactivity (rename/merge tags) added later.
+
+**Build approach:** Same Next.js pattern as other MC tools. API route hits the Pinboard API server-side, renders in a client component.
+
+---
+
+*Written: 2026-03-14. Updated: 2026-03-14 (tailnet deployment, auth decision, MC module added).*
