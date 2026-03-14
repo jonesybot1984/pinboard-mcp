@@ -96,14 +96,65 @@ This is where it gets genuinely useful — not just "new tag appeared" but "here
 
 ---
 
+## Tailnet Deployment (Required)
+
+The MCP server must be accessible across the full Tailscale network (`quagga-chicken.ts.net`), not just localhost. This means running as a **remote MCP server** over HTTPS — not the local stdio mode used by most example repos.
+
+### Architecture
+
+```
+Any device on tailnet
+  → https://jones.quagga-chicken.ts.net/pinboard-mcp
+    → nginx (reverse proxy, SSL termination)
+      → MCP server (Python, Streamable HTTP transport, localhost:PORT)
+```
+
+### What This Requires
+
+- **HTTP transport** (not stdio) — use FastMCP 2.0's `StreamableHTTP` mode
+- **systemd service** — runs persistently, restarts on failure, same pattern as mission-control
+- **nginx proxy** — add `/pinboard-mcp` location block to existing nginx config on jones
+- **Tailscale-only exposure** — bind to `jones.quagga-chicken.ts.net`, not public internet
+- **Auth** — MCP clients connect with a shared secret or the Pinboard token serves as implicit auth
+
+### MCP Client Config (for any device on tailnet)
+
+```json
+{
+  "mcpServers": {
+    "pinboard": {
+      "type": "streamable",
+      "url": "https://jones.quagga-chicken.ts.net/pinboard-mcp/mcp",
+      "headers": {
+        "Authorization": "Bearer <shared-secret>"
+      }
+    }
+  }
+}
+```
+
+This config works in Claude Desktop, Claude Code, Cursor, or any MCP-compatible client connected to the tailnet.
+
+### Deployment Script
+
+Follow the same pattern as mission-control:
+- `deploy.sh` — build + restart service in one step
+- `systemd` unit file in repo
+- nginx location block as a config snippet
+
+---
+
 ## Build Order
 
 - [ ] **Step 1:** Get Pinboard API token from Darrell, store in `.env`
 - [ ] **Step 2:** Build `tag_watcher.py` — fetch tags, diff, report
 - [ ] **Step 3:** Run first time to establish baseline (`tags_baseline.json`)
 - [ ] **Step 4:** Wire into Jones heartbeat or cron — auto-notify on new tags
-- [ ] **Step 5:** (Optional) MCP extension for interactive management
-- [ ] **Step 6:** (Optional) Claude tag consolidation analysis
+- [ ] **Step 5:** Build MCP server with HTTP transport (FastMCP 2.0, StreamableHTTP)
+- [ ] **Step 6:** Deploy as systemd service on jones
+- [ ] **Step 7:** Add nginx proxy block → expose on tailnet at `/pinboard-mcp`
+- [ ] **Step 8:** Test from another tailnet device
+- [ ] **Step 9:** (Optional) Claude tag consolidation analysis tools
 
 ---
 
@@ -112,8 +163,8 @@ This is where it gets genuinely useful — not just "new tag appeared" but "here
 - Does Darrell want baseline auto-updated after each report, or manual control?
 - Report threshold: report every new tag, or batch weekly?
 - Tag consolidation: read-only suggestions, or actually rename via API?
-- MCP route requires Claude Desktop installed — confirm if that's in use
+- Auth for MCP endpoint: shared secret header, or lean on Tailscale ACLs as the security layer?
 
 ---
 
-*Written: 2026-03-14. Awaiting Darrell's Pinboard token and preferences to proceed.*
+*Written: 2026-03-14. Updated: 2026-03-14 (tailnet deployment requirement added).*
