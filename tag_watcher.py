@@ -17,7 +17,7 @@ import json
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
@@ -59,7 +59,7 @@ def load_baseline() -> dict[str, int] | None:
 def save_baseline(tags: dict[str, int]) -> None:
     """Save current tag list as the new baseline."""
     payload = {
-        "updated": datetime.utcnow().isoformat() + "Z",
+        "updated": datetime.now(timezone.utc).isoformat(),
         "count": len(tags),
         "tags": tags,
     }
